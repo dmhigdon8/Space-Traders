@@ -8,11 +8,11 @@ faction = 'DOMINION'
 url = 'https://api.spacetraders.io/v2/'
 
 #get current location
+## Ex: X1-DF55-A1; X1 is the sector, DF55 is the system, A1 is the station
 response = requests.get(url + 'my/agent', headers=headers)
 
 if response.status_code == 200:
     json_data = response.json()
-
     account_id = json_data.get("data").get("accountId")
     headquarters = json_data.get("data").get("headquarters")
     credits = json_data.get("data").get("credits")
@@ -25,4 +25,3 @@ print(f"Account ID: {account_id}\n"
       f"Headquarters: {headquarters}\n"
       f"Credits: {credits}\n"
       f"Ship Count: {ship_count}\n")
-
