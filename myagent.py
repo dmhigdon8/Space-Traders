@@ -17,7 +17,6 @@ if response.status_code == 200:
     headquarters = json_data.get("data").get("headquarters")
     credits = json_data.get("data").get("credits")
     ship_count = json_data.get("data").get("shipCount")
-
 else:
     print(f"Error: {response.status_code}")
     print(response.text)
@@ -26,4 +25,3 @@ print(f"Account ID: {account_id}\n"
       f"Headquarters: {headquarters}\n"
       f"Credits: {credits}\n"
       f"Ship Count: {ship_count}\n")
-
