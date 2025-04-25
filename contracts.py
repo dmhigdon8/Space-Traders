@@ -8,11 +8,14 @@ faction = 'DOMINION'
 url = 'https://api.spacetraders.io/v2/'
 
 response = requests.get(url + 'my/contracts', headers=headers)
+json_data = response.json()
+print(json_data)
 
 if response.status_code == 200:
     contract_count = 1
     json_data = response.json()
     contracts = json_data.get("data", [])
+    print(type(contracts))
 
     for contract in contracts:
         contract_id = contract.get("id")
@@ -37,9 +40,14 @@ if response.status_code == 200:
               f"----Deliverables-----\n"
               f"Trade Symbol: {deliverable_tradesymbol} \nQuantity Required: {deliverable_quantity} \nUnits Fulfilled: {deliverable_unitsfulfilled} \nDestination: {deliverable_destination}\n"
               f"\n~~~End Contract {contract_count}~~~\n")
+        
+        contract_count += 1
 else:
     print(f"Error: {response.status_code}")
     print(response.text)
 
 
+## accept contract
+accept_conttract = requests.post(url + 'my/contracts/' + contract_id + '/accept', headers=headers)  
+print(accept_conttract.text)
 
