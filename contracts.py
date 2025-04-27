@@ -49,6 +49,6 @@ else:
 
 
 ## accept contract
-accept_conttract = requests.post(url + 'my/contracts/' + contract_id + '/accept', headers=headers)  
-print(accept_conttract.text)
+accept_contract = requests.post(url + 'my/contracts/' + contract_id + '/accept', headers=headers)  
+print(accept_contract.text)
 
