@@ -1,16 +1,19 @@
+import config
 import requests
 import json
 
-token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNC0yMCIsImlhdCI6MTc0NTM3MTEzOSwic3ViIjoiYWdlbnQtdG9rZW4ifQ.YR2svGz8zTThGdfLvpS6nhX9xgqlzuAxM0SnIRT3-JwlPrw8_z-IcGdxffRXqOVfE4Tf4RKPMLsX0bMzERVJBBkYNLy_cngKAnGTb3xWnPv4GE93jupZSjRmzmt1dXvLnMP6vRaCiO2qP-tHuiBm8gfk3IDyJ9MwRFz-58cJFSYtyFTaDz-FL_fQXRN4kcOPZMTbu-TaSZK-m68TSevr4eIfywyYm31aA7kxYbNxDCXm8EXQJi3g1n8mHfGh9CTPFFBJpdWz7jxqE1p20gqjqVfBSxALCvosjLb4KmsORItv_sCTwVDl2sdYWUbGvxbQNYqphusPTttQ1hfJ_l1fAXnGmlTa0ksQhMx9Eh4rnA8WBU4rL_P6wx05_CkdR7-910CA-l7Kav4wc0R6wM1f50xIYJeN481zkiddoj3T1IhOcDKo3AmkkUlqOjVHlDrBabIkQPvbvRvLrg_bZdIixNEPIa9AliainDoY7dwmu6Q0MAdSaqewIundzfZLDOJGOeSDdw_MPRNGW9ioGxzKgxZaJ4VhjMM5HIfMXDd_z1UY57PugnnUUXEgcPRan_HjCXHSil-xvfy4K2rcrGMu96SFfBCd4U_Jc8mL00yyAJ_bvoenJgpxRFy0V8bQd6lHoyOpj7YrM9yejkYQsMMnT2Fthd8suxj5MdLJw3PuBlE'
-header = 'Authorization: Bearer ' + token
-headers = {'Authorization': 'Bearer ' + token}
-symbol = 'LONESTARTIGER'
-faction = 'DOMINION'
-url = 'https://api.spacetraders.io/v2/'
+response = requests.get(config.url + 'my/ships', headers=config.headers)
+ships_data = response.json()
+print(json.dumps(ships_data, indent=4))
 
-ships = requests.get(url + 'my/ships', headers=headers)
-print(ships.text)
-ships_pretty = json.loads(ships.text)
-print(json.dumps(ships_pretty, indent=4))
+ships= {}
+for index, ship in enumerate(ships_data['data'], start=1):
+    ships[f'ship_{index}_symbol'] = ship['symbol']
+    ships[f'ship_{index}_system'] = ship['nav']['systemSymbol']
+    ships[f'ship_{index}_waypoint'] = ship['nav']['waypointSymbol']
 
 
+for key, value in ships.items():
+    print(f"{key}: {value}") 
+
+print(ships['ship_1_system'])
