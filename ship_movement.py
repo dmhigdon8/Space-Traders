@@ -168,3 +168,5 @@ print(json.dumps(contract_fulfillment_pretty, indent=4))
 
 #contract destination
 # 'X1-KG25-H53'
+
+#need to functionize this
