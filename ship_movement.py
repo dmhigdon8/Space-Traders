@@ -170,3 +170,73 @@ print(json.dumps(contract_fulfillment_pretty, indent=4))
 # 'X1-KG25-H53'
 
 #need to functionize this
+
+ship_symbol = 'LONESTARTIGER-1'
+destination = 'X1-KG25-B13'
+
+def ship_navigation(ship_symbol, destination):
+    # Check if the ship is docked
+    response = requests.get(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}', headers=config.headers)
+    ship_data = response.json()
+    print(json.dumps(ship_data, indent=4))
+    ship_status = ship_data.get("data").get("nav").get("status")
+    print(f"Ship Status: {ship_status}")
+    
+    if ship_status == "DOCKED":
+        # If docked, go to orbit
+        orbit = requests.post(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/orbit', headers=config.headers)
+        orbit_pretty = json.loads(orbit.text)
+        print(json.dumps(orbit_pretty, indent=4))
+    
+    # Navigate to the destination waypoint
+    navigate = requests.post(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/navigate', headers=config.headers, data={'waypointSymbol': destination})
+    navigate_pretty = json.loads(navigate.text)
+    print(json.dumps(navigate_pretty, indent=4))
+    return navigate_pretty
+
+    #add in code that saves arrival time as a variable and prints how long until arrival every 30 seconds
+    #then print arrived
+    #begin mining
+    #need to functionalize the mining
+
+
+
+# Call the function with the ship symbol and destination
+ship_navigation(ship_symbol, destination)
+
+navigate = requests.post(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/navigate', headers=config.headers, data={'waypointSymbol': destination})
+navigate_pretty = json.loads(navigate.text)
+print(json.dumps(navigate_pretty, indent=4))
+
+#mining logic
+mining_attempts = 1
+while True:
+    #perform mining
+    mine = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/extract', headers=config.headers)
+    mine_pretty = json.loads(mine.text)
+    print(json.dumps(mine_pretty, indent=4))
+
+    #check cargo hold post mining
+    cargo = requests.get('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/cargo', headers=config.headers)
+    cargo_pretty = json.loads(cargo.text)
+    print(json.dumps(cargo_pretty, indent=4))
+    cargo_units = cargo_pretty.get("data").get("capacity")
+    cargo_units_used = cargo_pretty.get("data").get("units")
+    print(f"Cargo Units: {cargo_units}\n"
+          f"Cargo Units Used: {cargo_units_used}\n"
+          #ToDo Pretty Print Inventory
+          f"Inventory: {cargo_pretty.get('data').get('inventory')}\n")
+    #for item in cargo_pretty['data']['inventory']:
+        #NEED TO GENERALIZE THIS, SHOULD PASS A PARAMETER FOR THE ITEM FOR CONTRACT RATHER THAN HARD CODING
+    #    if item['symbol'] != 'COPPER_ORE':
+    #        jettison_symbol = item['symbol']
+    #        jettison_units = item['units']
+    #        print(f"Jettisoning {jettison_units} units of {jettison_symbol}")
+    #        jettison = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/jettison', headers=config.headers, json={'symbol': jettison_symbol, 'units': jettison_units})
+  
+    if cargo_units_used >= cargo_units:
+        print("Cargo hold is full, stopping mining.")
+        break
+    print(f"Mining attempt {mining_attempts}\n")
+    mining_attempts += 1
+    time.sleep(ship_cooldown)
