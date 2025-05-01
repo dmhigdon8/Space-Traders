@@ -228,6 +228,7 @@ while True:
           f"Inventory: {cargo_pretty.get('data').get('inventory')}\n")
     #for item in cargo_pretty['data']['inventory']:
         #NEED TO GENERALIZE THIS, SHOULD PASS A PARAMETER FOR THE ITEM FOR CONTRACT RATHER THAN HARD CODING
+        #add parameter for contract run, if contract, jettison non contract items, else keep all until full
     #    if item['symbol'] != 'COPPER_ORE':
     #        jettison_symbol = item['symbol']
     #        jettison_units = item['units']
