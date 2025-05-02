@@ -38,18 +38,51 @@ account_id, symbol, headquarters, credits, faction, ship_count = get_agent_info(
 
 print(get_agent_info())
 
-def get_ship_info():
+def get_ship_info(ship):
     """
     Get the ship information.
     """
-    response = requests.get(url + 'my/ships', headers=headers)
+    if not isinstance(ship, str):
+        try:
+            ship = str(ship)
+        except (ValueError, TypeError):
+            print("Invalid ship symbol. Please provide a valid string.")
+            return None
+    #force the parameter to be uppercase
+    ship = ship.upper()   
+    response = requests.get(url + 'my/ships/' + ship, headers=headers)
     if response.status_code == 200:
-        json_data = response.json()
-        ships = json_data.get("data", [])
-        return ships
+        ships_data = response.json()
+        ship_symbol = ships_data['data']['symbol']
+        ship_status = ships_data['data']['nav']['status']
+        ship_flight_mode = ships_data['data']['nav']['flightMode']
+        ship_system = ships_data['data']['nav']['systemSymbol']
+        ship_waypoint = ships_data['data']['nav']['waypointSymbol']
+        ship_cargo_capacity = ships_data['data']['cargo']['capacity']
+        ship_cargo_used = ships_data['data']['cargo']['units']
+        ship_cargo_free = ships_data['data']['cargo']['capacity'] - ships_data['data']['cargo']['units']
+        ship_fuel_capacity = ships_data['data']['fuel']['capacity']
+        ship_fuel_available = ships_data['data']['fuel']['current']
+        ship_fuel_burned = ships_data['data']['fuel']['capacity'] - ships_data['data']['fuel']['current']
+        #return ship_symbol, ship_status, ship_flight_mode, ship_system, ship_waypoint, ship_cargo_capacity, ship_cargo_used, ship_cargo_free, ship_fuel_capacity, ship_fuel_available, ship_fuel_burned
+        return print(f"Ship Symbol: {ship_symbol}\n"
+                        f"---Current Status---\n"
+                      f"Ship Status: {ship_status}\n"
+                      f"Ship Flight Mode: {ship_flight_mode}\n"
+                        f"---Nav Info---\n"
+                      f"Ship System: {ship_system}\n"
+                      f"Ship Waypoint: {ship_waypoint}\n"
+                        f"---Cargo Info---\n"
+                      f"Ship Cargo Capacity: {ship_cargo_capacity}\n"
+                      f"Ship Cargo Used: {ship_cargo_used}\n"
+                      f"Ship Cargo Free: {ship_cargo_free}\n"
+                        f"---Fuel Info---\n"
+                      f"Ship Fuel Capacity: {ship_fuel_capacity}\n"
+                      f"Ship Fuel Available: {ship_fuel_available}\n"
+                      f"Ship Fuel Burned: {ship_fuel_burned}\n")   
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
 
-
+get_ship_info('LONESTARTIGER-1')
 
