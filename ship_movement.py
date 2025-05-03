@@ -4,17 +4,43 @@ import json
 import time
 from ships import ships
 
-#token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNC0yMCIsImlhdCI6MTc0NTM3MTEzOSwic3ViIjoiYWdlbnQtdG9rZW4ifQ.YR2svGz8zTThGdfLvpS6nhX9xgqlzuAxM0SnIRT3-JwlPrw8_z-IcGdxffRXqOVfE4Tf4RKPMLsX0bMzERVJBBkYNLy_cngKAnGTb3xWnPv4GE93jupZSjRmzmt1dXvLnMP6vRaCiO2qP-tHuiBm8gfk3IDyJ9MwRFz-58cJFSYtyFTaDz-FL_fQXRN4kcOPZMTbu-TaSZK-m68TSevr4eIfywyYm31aA7kxYbNxDCXm8EXQJi3g1n8mHfGh9CTPFFBJpdWz7jxqE1p20gqjqVfBSxALCvosjLb4KmsORItv_sCTwVDl2sdYWUbGvxbQNYqphusPTttQ1hfJ_l1fAXnGmlTa0ksQhMx9Eh4rnA8WBU4rL_P6wx05_CkdR7-910CA-l7Kav4wc0R6wM1f50xIYJeN481zkiddoj3T1IhOcDKo3AmkkUlqOjVHlDrBabIkQPvbvRvLrg_bZdIixNEPIa9AliainDoY7dwmu6Q0MAdSaqewIundzfZLDOJGOeSDdw_MPRNGW9ioGxzKgxZaJ4VhjMM5HIfMXDd_z1UY57PugnnUUXEgcPRan_HjCXHSil-xvfy4K2rcrGMu96SFfBCd4U_Jc8mL00yyAJ_bvoenJgpxRFy0V8bQd6lHoyOpj7YrM9yejkYQsMMnT2Fthd8suxj5MdLJw3PuBlE'
-#header = 'Authorization: Bearer ' + token
-#headers = {'Authorization': 'Bearer ' + token}
-#symbol = 'LONESTARTIGER'
-#faction = 'DOMINION'
-#url = 'https://api.spacetraders.io/v2/'
-#systemSymbol = 'X1-MU86'
 systemSymbol = ships['ship_1_system']
 ship_symbol = ships['ship_1_symbol']
 location_type = 'ENGINEERED_ASTEROID'
 ship_cooldown = 80
+
+#calling ship & agent functions from config to get ship and agent info
+ship_symbol, ship_status, ship_flight_mode, ship_system, ship_waypoint, ship_cargo_capacity, ship_cargo_used, ship_cargo_free, ship_fuel_capacity, ship_fuel_available, ship_fuel_burned = config.get_ship_info('LONESTARTIGER-1') 
+account_id, account_symbol, headquarters, credits, faction, ship_count = config.get_agent_info()
+print(ship_status)
+
+#need to finish this
+def ship_navigation(ship_symbol, destination):
+    #check fuel
+    fuel = requests.get(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/fuel', headers=config.headers)
+    fuel_pretty = json.loads(fuel.text)
+    print(json.dumps(fuel_pretty, indent=4))
+    
+    # Check if the ship is docked
+    response = requests.get(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}', headers=config.headers)
+    ship_data = response.json()
+    print(json.dumps(ship_data, indent=4))
+    ship_status = ship_data.get("data").get("nav").get("status")
+    print(f"Ship Status: {ship_status}")
+    
+    if ship_status == "DOCKED":
+        # If docked, go to orbit
+        orbit = requests.post(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/orbit', headers=config.headers)
+        orbit_pretty = json.loads(orbit.text)
+        print(json.dumps(orbit_pretty, indent=4))
+    
+    # Navigate to the destination waypoint
+    navigate = requests.post(f'https://api.spacetraders.io/v2/my/ships/{ship_symbol}/navigate', headers=config.headers, data={'waypointSymbol': destination})
+    navigate_pretty = json.loads(navigate.text)
+    print(json.dumps(navigate_pretty, indent=4))
+    return navigate_pretty
+
+
 
 # get waypoint for engineered asteroid
 engineered_asteroid = requests.get('https://api.spacetraders.io/v2/systems/' + systemSymbol + '/waypoints?type=' + location_type, headers=config.headers)
@@ -241,3 +267,5 @@ while True:
     print(f"Mining attempt {mining_attempts}\n")
     mining_attempts += 1
     time.sleep(ship_cooldown)
+
+
