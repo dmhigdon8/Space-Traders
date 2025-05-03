@@ -1,18 +1,67 @@
+# This file contains logic to move the ship to a location, refuel, and mine
+
+# MODULES
 import config
 import requests
 import json
 import time
 from ships import ships
 
-systemSymbol = ships['ship_1_system']
-ship_symbol = ships['ship_1_symbol']
+# VARIABLES
+#manually defined variables
 location_type = 'ENGINEERED_ASTEROID'
 ship_cooldown = 80
 
+#pulls from ships.py, loops through all ships and saves variables for each
+#be aware of using ship variables from ships.py vs config.py
+systemSymbol = ships['ship_1_system']
+ship_symbol = ships['ship_1_symbol']
+
+#calls functions for agent and ship info defined in config.py
 #calling ship & agent functions from config to get ship and agent info
 ship_symbol, ship_status, ship_flight_mode, ship_system, ship_waypoint, ship_cargo_capacity, ship_cargo_used, ship_cargo_free, ship_fuel_capacity, ship_fuel_available, ship_fuel_burned = config.get_ship_info('LONESTARTIGER-1') 
 account_id, account_symbol, headquarters, credits, faction, ship_count = config.get_agent_info()
-print(ship_status)
+
+#SCRATCH
+print(f"Ship Symbol: {ship_symbol}\n"
+      f"Status: {ship_status}\n"
+      f"Fuel Capacity: {ship_fuel_capacity}\n"
+      f"Fuel Available: {ship_fuel_available}\n")
+
+# FUNCTIONS
+   # being with need to refuel logic
+if ship_fuel_capacity > ship_fuel_available:
+    # add logic to check if waypoint has fuel for sale; if not, print that and exit to navigate to a new waypoint
+    # print info on locations in system with fuel for sale, distance, ask user which to navigate and feed that back to the function
+    if ship_status = 'IN_ORBIT':
+        # docking ship to refuel, confirms status at end
+        print("Ship is in orbit and needs fuel. Docking at current waypoint to attempt refueling.\n")
+        dock = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/dock', headers=config.headers, data={'waypointSymbol': ship_waypoint})
+        confirm_dock_text = json.loads(dock.text)
+        confirm_dock = confirm_dock_text['data']['nav']['status']
+        print(f"New Ship Status: {confirm_dock}\n")
+        
+        # refueling ship
+         
+        print(f"Beginning refueling at {ship_waypoint}.\n")
+
+
+print(test_dock)
+        #add api call to refuel
+        #add api call to go to dock
+        #print ship status to show in dock
+
+    print("Ship is docked and but needs fuel. Beginning refueling.")
+    #add api call to refuel
+    #add api call to go to orbit
+     #print ship status to show in orbit
+
+elif ship_fuel_capacity == ship_fuel_available & ship_status == 'IN_ORBIT':
+    print("Ship is in orbit and has full fuel, no need to refuel. Beginning journey")
+    #add api call to go to orbit
+     #print ship status to show in orbit
+
+
 
 #need to finish this
 def ship_navigation(ship_symbol, destination):
@@ -57,7 +106,8 @@ navigate_pretty = json.loads(navigate.text)
 print(json.dumps(navigate_pretty, indent=4))
 
 #dock at waypoint to the refuel
-dock = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/dock', headers=config.headers, data={'waypointSymbol': destination})
+
+dock = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/dock', headers=config.headers, data={'waypointSymbol': ship_waypoint})
 dock_pretty = json.loads(dock.text)
 print(json.dumps(dock_pretty, indent=4))
 
@@ -148,6 +198,10 @@ print(json.dumps(navigate_pretty, indent=4))
 
 #dock at waypoint
 dock = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/dock', headers=config.headers, data={'waypointSymbol': 'X1-KG25-H53'})
+dock_pretty = json.loads(dock.text)
+
+test_dock = dock_pretty['data']['nav']['status']
+print(test_dock)
 dock_pretty = json.loads(dock.text)
 print(json.dumps(dock_pretty, indent=4))
 
