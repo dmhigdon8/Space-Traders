@@ -4,7 +4,7 @@ import json
 from ships import ships
 
 systemSymbol = ships['ship_1_system']
-
+print(systemSymbol)
 #finalized fuel station function
 #TODO: add to config.py? See if I can calculate the distance between the two waypoints (euclidean distance) from ship to waypoints and return nearest to ship
 def get_fuel_stations(systemsymbol):
@@ -278,3 +278,4 @@ if response.status_code == 200:
 else:
     print(f"Error: {response.status_code}")
     print(response.text)
+
