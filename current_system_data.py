@@ -98,6 +98,7 @@ waypoints = json_data.get("data", [])
 print(json.dumps(waypoints, indent=4))
 
 #find the types of waypoints in the system
+
 waypoint_types = []
 for waypoint in waypoints:
     if waypoint.get("type") not in waypoint_types:
