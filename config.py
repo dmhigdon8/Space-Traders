@@ -1,4 +1,4 @@
-# This file contains the configuration for the Space Traders API
+# This file contains the configuration for the Space Traders, and defines functions for use in other programs
 
 # MODULES
 import json
@@ -60,6 +60,42 @@ def get_ship_info(ship):
     response = requests.get(url + 'my/ships/' + ship, headers=headers)
     if response.status_code == 200:
         ships_data = response.json()
+        ship_info = {
+        'ship_symbol' : ships_data['data']['symbol'],
+        'ship_status' : ships_data['data']['nav']['status'],
+        'ship_flight_mode' : ships_data['data']['nav']['flightMode'],
+        'ship_system' : ships_data['data']['nav']['systemSymbol'],
+        'ship_waypoint' : ships_data['data']['nav']['waypointSymbol'],
+        'ship_x' : ships_data['data']['nav']['route']['destination']['x'],
+        'ship_y' : ships_data['data']['nav']['route']['destination']['y'],
+        'ship_coord' : (ships_data['data']['nav']['route']['destination']['x'], ships_data['data']['nav']['route']['destination']['y']),
+        'ship_cargo_capacity' : ships_data['data']['cargo']['capacity'],
+        'ship_cargo_used' : ships_data['data']['cargo']['units'],
+        'ship_cargo_free' : ships_data['data']['cargo']['capacity'] - ships_data['data']['cargo']['units'],
+        'ship_fuel_capacity' : ships_data['data']['fuel']['capacity'],
+        'ship_fuel_available' : ships_data['data']['fuel']['current'],
+        'ship_fuel_burned' : ships_data['data']['fuel']['capacity'] - ships_data['data']['fuel']['current']
+        }
+        return ship_info
+    else:
+        print(f"Error: {response.status_code}")
+        print(response.text)
+
+def print_ship_info(ship):
+    """
+    Get the ship information.
+    """
+    if not isinstance(ship, str):
+        try:
+            ship = str(ship)
+        except (ValueError, TypeError):
+            print("Invalid ship symbol. Please provide a valid string.")
+            return None
+    #force the parameter to be uppercase
+    ship = ship.upper()   
+    response = requests.get(url + 'my/ships/' + ship, headers=headers)
+    if response.status_code == 200:
+        ships_data = response.json()
         ship_symbol = ships_data['data']['symbol']
         ship_status = ships_data['data']['nav']['status']
         ship_flight_mode = ships_data['data']['nav']['flightMode']
@@ -74,7 +110,7 @@ def get_ship_info(ship):
         ship_fuel_capacity = ships_data['data']['fuel']['capacity']
         ship_fuel_available = ships_data['data']['fuel']['current']
         ship_fuel_burned = ships_data['data']['fuel']['capacity'] - ships_data['data']['fuel']['current']
-        print(f"Ship Symbol: {ship_symbol}\n"
+        return print(f"Ship Symbol: {ship_symbol}\n"
                         f"---Current Status---\n"
                       f"Ship Status: {ship_status}\n"
                       f"Ship Flight Mode: {ship_flight_mode}\n"
@@ -92,23 +128,24 @@ def get_ship_info(ship):
                       f"Ship Fuel Capacity: {ship_fuel_capacity}\n"
                       f"Ship Fuel Available: {ship_fuel_available}\n"
                       f"Ship Fuel Burned: {ship_fuel_burned}\n")   
-        return ship_symbol, ship_status, ship_flight_mode, ship_system, ship_waypoint, ship_x, ship_y, ship_coord, ship_cargo_capacity, ship_cargo_used, ship_cargo_free, ship_fuel_capacity, ship_fuel_available, ship_fuel_burned
+        
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
 
 get_ship_info("LONESTARTIGER-1")
+print_ship_info("LONESTARTIGER-1")
 
 
-response = requests.get(url + 'my/ships/LONESTARTIGER-1', headers=headers)
-ships_data = response.json()
-ship_x = ships_data['data']['nav']['route']['destination']['x']
-ship_y = ships_data['data']['nav']['route']['destination']['y']
-ship_coord = (ship_x, ship_y)
-print(f"Ship Coordinates: {ship_coord}")
-print(ship_x)
-print(ship_y)
-print(json.dumps(ships_data, indent=4))
+#response = requests.get(url + 'my/ships/LONESTARTIGER-1', headers=headers)
+#ships_data = response.json()
+#ship_x = ships_data['data']['nav']['route']['destination']['x']
+#ship_y = ships_data['data']['nav']['route']['destination']['y']
+#ship_coord = (ship_x, ship_y)
+#print(f"Ship Coordinates: {ship_coord}")
+#print(ship_x)
+#print(ship_y)
+#print(json.dumps(ships_data, indent=4))
 
 
 def euclidean_distance(ship, destination_coord):
@@ -118,15 +155,19 @@ def euclidean_distance(ship, destination_coord):
     :param ship_coord: Tuple of the ship's coordinates (x, y).
     :param destination_coord: Tuple of the destination coordinates (x, y).
     """
-    ship_coord = get_ship_info(ship)[7]
-    print(f"Ship Coordinates: {ship_coord}")
-    print(f"Destination Coordinates: {destination_coord}")
+    ship_coord = get_ship_info(ship)['ship_coord']
+    #print(f"Ship Coordinates: {ship_coord}")
+    #print(f"Destination Coordinates: {destination_coord}")
     # Calculate the Euclidean distance
-    print(f"Euclidean Distance: {((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5}")
+    #print(f"Euclidean Distance: {((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5}")
     # Return the distance
     return ((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5
 
-#euclidean_distance('LONESTARTIGER-1', (12, -24))
+euclidean_distance('LONESTARTIGER-1', (12, -24))
 
+get_ship_info("LONESTARTIGER-1")
+
+
+print(get_ship_info("LONESTARTIGER-1")['ship_coord'])
 
 
