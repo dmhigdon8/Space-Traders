@@ -34,6 +34,7 @@ def get_fuel_stations(systemsymbol):
                             "symbol": waypoint.get("symbol"),
                             "x": waypoint.get("x"),
                             "y": waypoint.get("y"),
+                            "coordinates": (waypoint.get("x"), waypoint.get("y")),
                             "type": "MARKETPLACE"
                         }
                         fuel_marketplaces.append(fuel_waypoint_data)
@@ -49,6 +50,7 @@ def get_fuel_stations(systemsymbol):
             "symbol": fuel_station.get("symbol"),
             "x": fuel_station.get("x"),
             "y": fuel_station.get("y"),
+            "coordinates": (fuel_station.get("x"), fuel_station.get("y")),
             "type": "FUEL_STATION"
         }
         fuel_station_list.append(fuel_station_data)
@@ -66,6 +68,25 @@ def get_fuel_stations(systemsymbol):
 #call the function to get all fuel stations in the system
 all_system_fuel_stations = get_fuel_stations(systemSymbol)
 print(all_system_fuel_stations)
+
+### create function for finding nearest fuel station
+def find_nearest_fuel_station(ship): #, systemsymbol):
+    """
+    Takes a ship and a system symbol and returns the nearest fuel station.
+    """
+    ship_coord = config.get_ship_info(ship)['ship_coord']
+    for fuel_station in all_system_fuel_stations:
+        fuel_station_coord = fuel_station['coordinates']
+        distance = (config.euclidean_distance(ship, fuel_station['coordinates'])) 
+        fuel_stations = {
+            "symbol": fuel_station['symbol'],
+            "coordinates": fuel_station['coordinates'],
+            "distance": distance
+        }
+        print(f"Fuel Station: {fuel_station['symbol']}; {fuel_station['coordinates']}; Distance: {distance}")   
+    return fuel_stations
+
+find_nearest_fuel_station('LONESTARTIGER-1')
 
 #get all waypoints in current system
 ## Ex: X1-DF55-A1; X1 is the sector, DF55 is the system, A1 is the station
