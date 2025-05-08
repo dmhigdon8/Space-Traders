@@ -70,6 +70,7 @@ all_system_fuel_stations = get_fuel_stations(systemSymbol)
 print(all_system_fuel_stations)
 
 ### create function for finding nearest fuel station
+##next...add to mining functions so that takes ship to refuel as needed
 def find_nearest_fuel_station(ship): #, systemsymbol):
     """
     Takes a ship and a system symbol and returns the nearest fuel station.
@@ -84,10 +85,8 @@ def find_nearest_fuel_station(ship): #, systemsymbol):
             "coordinates": (fuel_station['x'], fuel_station['y']),
             "distance": distance
         }
-        fuel_stations.append(fuel_station_data)
-        #print(f"Fuel Station: {fuel_station['symbol']}; {fuel_station['coordinates']}; Distance: {distance}")   
+        fuel_stations.append(fuel_station_data)  
     closest_station = min(fuel_stations, key=lambda x: x['distance'])
-    #print(f"Closest Station: {closest_station['symbol']}; {closest_station['coordinates']}; Distance: {closest_station['distance']}")   
     return closest_station
 
 find_nearest_fuel_station('LONESTARTIGER-1')
