@@ -75,16 +75,20 @@ def find_nearest_fuel_station(ship): #, systemsymbol):
     Takes a ship and a system symbol and returns the nearest fuel station.
     """
     ship_coord = config.get_ship_info(ship)['ship_coord']
+    fuel_stations = []
     for fuel_station in all_system_fuel_stations:
         fuel_station_coord = fuel_station['coordinates']
         distance = (config.euclidean_distance(ship, fuel_station['coordinates'])) 
-        fuel_stations = {
+        fuel_station_data = {
             "symbol": fuel_station['symbol'],
-            "coordinates": fuel_station['coordinates'],
+            "coordinates": (fuel_station['x'], fuel_station['y']),
             "distance": distance
         }
-        print(f"Fuel Station: {fuel_station['symbol']}; {fuel_station['coordinates']}; Distance: {distance}")   
-    return fuel_stations
+        fuel_stations.append(fuel_station_data)
+        #print(f"Fuel Station: {fuel_station['symbol']}; {fuel_station['coordinates']}; Distance: {distance}")   
+    closest_station = min(fuel_stations, key=lambda x: x['distance'])
+    #print(f"Closest Station: {closest_station['symbol']}; {closest_station['coordinates']}; Distance: {closest_station['distance']}")   
+    return closest_station
 
 find_nearest_fuel_station('LONESTARTIGER-1')
 
