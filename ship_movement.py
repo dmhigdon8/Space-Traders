@@ -29,8 +29,17 @@ print(f"Ship Symbol: {ship_symbol}\n"
       f"Fuel Available: {ship_fuel_available}\n")
 
 # FUNCTIONS
-   # being with need to refuel logic
-if ship_fuel_capacity > ship_fuel_available:
+   # begin with need to refuel logic
+if ship_fuel_capacity > ship_fuel_available & ship_status == 'DOCKED':
+    print("Ship is docked and needs fuel. Attempting to refuel.\n")
+    try:
+        # refueling ship
+        print(f"Beginning refueling at {ship_waypoint}.\n")
+        fuel = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/refuel', headers=config.headers)
+        fuel_pretty = json.loads(fuel.text)
+        print(json.dumps(fuel_pretty, indent=4))
+        confirm_refuel = fuel_pretty['data']['nav']['status']
+        print(f"New Ship Status: {confirm_refuel}\n")
     # add logic to check if waypoint has fuel for sale; if not, print that and exit to navigate to a new waypoint
     # print info on locations in system with fuel for sale, distance, ask user which to navigate and feed that back to the function
     if ship_status = 'IN_ORBIT':
