@@ -30,7 +30,63 @@ print(f"Ship Symbol: {ship_symbol}\n"
 
 # FUNCTIONS
    # begin with need to refuel logic
-if ship_fuel_capacity > ship_fuel_available & ship_status == 'DOCKED':
+
+def get_fuel():
+    """
+    This function checks the ship status, if in orbit, it docsk and refuels, otherwise just refuels.
+    """
+
+    
+
+#situations to check
+# 1. need fuel and docked
+# 2. need fuel and in orbit
+# 3. full fuel and docked
+# 4. full fuel and in orbit
+
+#1
+if config.get_ship_info("LONESTARTIGER-1")['ship_fuel_capacity'] > config.get_ship_info("LONESTARTIGER-1")['ship_fuel_available'] and config.get_ship_info("LONESTARTIGER-1")['ship_status'] == 'DOCKED':
+    print("Ship is docked and needs fuel. Attempting to refuel.\n")
+    # refueling ship
+    print(f"Beginning refueling at {config.get_ship_info('LONESTARTIGER-1')['ship_waypoint']}.\n")
+    fuel = requests.post('https://api.spacetraders.io/v2/my/ships/' + config.get_ship_info("LONESTARTIGER-1")['ship_symbol'] + '/refuel', headers=config.headers)
+    if fuel.status_code != 200:
+        print(f"Error: {fuel.status_code}")
+        print(fuel.text)
+    else:
+        print(f"    Refueling successful at {config.get_ship_info('LONESTARTIGER-1')['ship_waypoint']}.\n")
+        print(f"    Units of fuel purchased: {fuel_pretty['data']['transaction']['units']}\n")
+        print(f"    Price per unit: {fuel_pretty['data']['transaction']['pricePerUnit']}\n")
+        print(f"    Total cost: {fuel_pretty['data']['transaction']['totalPrice']}\n")
+
+    # back to orbit for travel
+    print(f"Undocking ship from {config.get_ship_info('LONESTARTIGER-1')['ship_waypoint']}.\n")
+    orbit = orbit = requests.post('https://api.spacetraders.io/v2/my/ships/' + config.get_ship_info('LONESTARTIGER-1')['ship_symbol'] + '/orbit', headers=config.headers)
+    #confirm in orbit
+    print(f"Ship Status: {config.get_ship_info('LONESTARTIGER-1')['ship_status']}\n")
+
+#2
+if config.get_ship_info("LONESTARTIGER-1")['ship_fuel_capacity'] > config.get_ship_info("LONESTARTIGER-1")['ship_fuel_available'] and config.get_ship_info("LONESTARTIGER-1")['ship_status'] != 'DOCKED':
+#    use nearest fuel function to get that waypoint, travel to waypoint, then go through fueling process
+
+#3
+if config.get_ship_info("LONESTARTIGER-1")['ship_fuel_capacity'] == config.get_ship_info("LONESTARTIGER-1")['ship_fuel_available'] and config.get_ship_info("LONESTARTIGER-1")['ship_status'] == 'DOCKED':
+    print("Ship is docked and has full fuel, no need to refuel. Going to orbit.\n")
+    print(f"Undocking ship from {config.get_ship_info('LONESTARTIGER-1')['ship_waypoint']}.\n")
+    orbit = orbit = requests.post('https://api.spacetraders.io/v2/my/ships/' + config.get_ship_info('LONESTARTIGER-1')['ship_symbol'] + '/orbit', headers=config.headers)
+    #confirm in orbit
+    print(f"Ship Status: {config.get_ship_info('LONESTARTIGER-1')['ship_status']}\n")
+
+
+
+    # back to orbit for travel
+    print(f"Undocking ship from {config.get_ship_info('LONESTARTIGER-1')['ship_waypoint']}.\n")
+    orbit = requests.post('https://api.spacetraders.io/v2/my/ships/' + config.get_ship_info('LONESTARTIGER-1')['ship_symbol'] + '/orbit', headers=config.headers)
+    #confirm in orbit
+    print(f"Ship Status: {config.get_ship_info('LONESTARTIGER-1')['ship_status']}\n")
+
+print(get_ship_info("LONESTARTIGER-1")['ship_status'])
+if ship_fuel_capacity > ship_fuel_available and ship_status == 'DOCKED':
     print("Ship is docked and needs fuel. Attempting to refuel.\n")
     try:
         # refueling ship
