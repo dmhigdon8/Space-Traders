@@ -14,6 +14,7 @@ response = requests.get(url + 'my/ships', headers=headers)
 ships_data = response.json()
 print(json.dumps(ships_data, indent=4))
 
+
 # FUNCTIONS
 
 #agent & account information
@@ -136,6 +137,64 @@ def print_ship_info(ship):
 get_ship_info("LONESTARTIGER-1")
 print_ship_info("LONESTARTIGER-1")
 
+def dock_ship(ship, destination=None):
+    """
+    Dock the ship at the specified destination. If a destination is not provided, the ship will dock at the current waypoint.
+    :param ship: The symbol of the ship to dock.
+    :param destination: The symbol of the destination waypoint. If not provided, the ship will dock at the current waypoint.
+    """
+    if destination is None:
+        destination = get_ship_info(ship)['ship_waypoint']
+    if not isinstance(ship, str):
+        try:
+            ship = str(ship)
+        except (ValueError, TypeError):
+            print("Invalid ship symbol. Please provide a valid string.")
+            return None
+    #force the parameter to be uppercase
+    ship = ship.upper()   
+    dock = requests.post(url + 'my/ships/' + ship + '/dock', headers=headers,
+                         data={'waypointSymbol': destination})
+    return print(f"Ship status: {get_ship_info(ship)['ship_status']}.\n")
+
+print(dock_ship('LONESTARTIGER-1'))
+
+
+def refuel_ship(ship):    # refueling ship
+    print(f"Beginning refueling at {get_ship_info(ship)['ship_waypoint']}.\n")
+    fuel = requests.post('https://api.spacetraders.io/v2/my/ships/' + get_ship_info(ship)['ship_symbol'] + '/refuel', headers=headers)
+    fuel_pretty = json.loads(fuel.text)
+    if fuel.status_code != 200:
+        error = fuel.json()
+        print(error)
+        print(f"Error: " + error['message'])
+   
+        #result = "Error: {fuel.message}"
+    else:
+        result = (f"   Refueling successful at {get_ship_info(ship)['ship_waypoint']}.\n"
+                 f"    Units of fuel purchased: {fuel_pretty['data']['transaction']['units']}\n"
+                 f"    Price per unit: {fuel_pretty['data']['transaction']['pricePerUnit']}\n"
+                 f"    Total cost: {fuel_pretty['data']['transaction']['totalPrice']}\n"
+                 f"Refuel complete.\n")
+    return result
+
+print(refuel_ship('LONESTARTIGER-1'))
+
+def launch_to_orbit(ship):  # back to orbit for travel
+    print(f"Undocking ship from {get_ship_info(ship)['ship_waypoint']}.\n")
+    orbit = requests.post('https://api.spacetraders.io/v2/my/ships/' + get_ship_info(ship)['ship_symbol'] + '/orbit', headers=headers)
+    if orbit.status_code != 200:
+        result = "Error: {orbit.status_code}"
+    else:
+        result = (f"    Ship status: {get_ship_info(ship)['ship_status']}\n"
+                  f"    Ship waypoint: {get_ship_info(ship)['ship_waypoint']}\n"
+                  f"    Ship coordinates: {get_ship_info(ship)['ship_coord']}\n"
+                  f"Successfully launched to orbit.\n")
+    return result
+
+print(launch_to_orbit('LONESTARTIGER-1'))
+
+
 
 #response = requests.get(url + 'my/ships/LONESTARTIGER-1', headers=headers)
 #ships_data = response.json()
@@ -165,7 +224,8 @@ def euclidean_distance(ship, destination_coord):
 
 euclidean_distance('LONESTARTIGER-1', (12, -24))
 
-get_ship_info("LONESTARTIGER-1")
+print(get_ship_info("LONESTARTIGER-1")['ship_status'])
+
 
 
 print(get_ship_info("LONESTARTIGER-1")['ship_coord'])
