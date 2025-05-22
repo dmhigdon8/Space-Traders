@@ -13,7 +13,7 @@ class User:
         self.token = token
         self.headers = headers
         self.url = url
-        
+
 User = User(token, headers, url)
 # Print the attributes of the User class
 # This will print the token, headers, and url
@@ -22,9 +22,9 @@ print("Token:", User.token)
 print("Headers:", User.headers)
 print("URL:", User.url)    
 
-print(User.token)
-print(User.headers)
-print(User.url)     
+#print(User.token)
+#print(User.headers)
+#print(User.url)     
 
 
 class ship:
@@ -68,9 +68,29 @@ class ship:
         else:
             print(f"API request failed with status code: {response.status_code}: {response.text}")
             return None
+
+    def get_current_fuel(self):
+        if not isinstance(self.name, str):
+            print("Invalid ship symbol. Please provide a valid string.")
+            return None
+            
+        response = requests.get(f"{url}my/ships/{self.name}", headers=headers)
+        if response.status_code == 200:
+            try:
+                ships_data = response.json()
+                return ships_data['data']['fuel']['current']
+            except (KeyError, ValueError) as e:
+                print(f"Error parsing ship data: {e}")
+                return None
+        else:
+            print(f"API request failed with status code: {response.status_code}: {response.text}")
+            return None
+            
+        
     
 ship1 = ship('LONESTARTIGER-1')
 
 print(ship1.get_cargo_capacity())
 print(ship1.get_fuel_capacity())
+print(ship1.get_current_fuel())
   
