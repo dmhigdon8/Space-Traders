@@ -33,7 +33,7 @@ print(f"Ship Symbol: {ship_symbol}\n"
 
 def get_fuel():
     """
-    This function checks the ship status, if in orbit, it docsk and refuels, otherwise just refuels.
+    This function checks the ship status, if in orbit, it docks and refuels, otherwise just refuels.
     """
 
 
