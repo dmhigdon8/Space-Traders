@@ -2,6 +2,7 @@ import json
 import requests
 import time
 
+
 # VARIABLES
 token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNS0xOCIsImlhdCI6MTc0NzcxMzk1OCwic3ViIjoiYWdlbnQtdG9rZW4ifQ.XGItP-gPIvscAw9SwcAFVlFSnLTkWbftYU3b619LjuI8SaX4oyVsA-PyXj35GLYXzZvOWfT96PpSpntw5YTHlnT795vBTXgzBvfh2989AiLXE5dxNpZ32JTgZKm3b2dLim7A2W4n4cn28Dzc7AOUsvr8fNlm1V5GSVvLtotTkyrDc_Q-3xF0HJjVXMg9Nj8f_fV17U6jV-RdeemSMiXPJ7dMlkW9xi3sWOVry2-hzbmkO8FmjNGbxkKMAu-CG1L_FQX7ZeOS2z4vcn475t1Ru7_mB7Z4_pvXfH631CcHuE-gGKLBkY5lI9fU4ccKswpo5P3z25woJGDjtPjxGC1-8-L_iYp4BuWUVi2drOX4Bh3DESO6darTQdi5wuMbLOogYLTAVNEGubXnbuDlJuGFhIL4RyqXTu1zO7TQTi_ox_1rseEhZGczzdZcVw9OA0MP2Gox5vLFzVTeF8u47y0UtHdVbxWW10MnrFlBDlzk4FlA8WnmHhQd0SzUPexsb3XpFLpLi16YjMf79guUX-tJ7VXhtccv3q-mKI_8NwNwotHZac_RJVen65-PnJkQbZAyF6jSqLF_jgShizD84dgylWMS3UeKoRui3XVQLEngbvUiCQXyPAOR0Ix5IuqMe6KpLe9hE0niurzynUx5s3bOqnhGamCLAZu9t67uHvvxXfU'
 headers = {'Authorization': 'Bearer ' + token}
@@ -13,19 +14,6 @@ class User:
         self.token = token
         self.headers = headers
         self.url = url
-
-#User = User(token, headers, url)
-# Print the attributes of the User class
-# This will print the token, headers, and url
-#print("User class attributes:")
-#print("Token:", User.token)
-#print("Headers:", User.headers)
-#print("URL:", User.url)    
-
-#print(User.token)
-#print(User.headers)
-#print(User.url)     
-
 
 class Ship(User):
     """starting a class"""
@@ -65,9 +53,9 @@ class Ship(User):
             self.flight_mode = data.get('nav', {}).get('flightMode', 'UNKNOWN')
             self.system = data.get('nav', {}).get('systemSymbol', 'UNKNOWN')
             self.ship_role = data.get('role', 'UNKNOWN')
-            self.ship_x = data.get('nav', {}).get('x', 'UNKNOWN')
-            self.ship_y = data.get('nav', {}).get('y', 'UNKNOWN')
-            self.ship_coordinates = (data.get('nav', {}).get('x', 'UNKNOWN'), data.get('nav', {}).get('y', 'UNKNOWN'))
+            self.ship_x = data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN')
+            self.ship_y = data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN')
+            self.ship_coordinates = (data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN'), data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN'))
             return data
         except requests.exceptions.RequestException as e:
             print(f"API request failed with status code {response.status_code}: {e}") 
@@ -84,8 +72,14 @@ class Ship(User):
 ship1 = Ship('LONESTARTIGER-1', token, headers, url) 
 print(ship1)
 ship1.fetch_ship_data()
+ship1.ship_x
+
+
 print(ship1.status) 
 print(ship1.cargo_capacity)
 print(ship1.fuel_available)
 print(ship1.fuel_used)
 print(ship1.fuel_percentage)
+print(ship1.ship_coordinates)
+
+print(ship1.status)
