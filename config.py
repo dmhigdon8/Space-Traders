@@ -16,7 +16,83 @@ ships_data = response.json()
 print(json.dumps(ships_data, indent=4))
 
 
-# FUNCTIONS
+# SETUP
+def get_api_credentials():
+    """
+    Creates a dictionary to store the API credentials.
+    """
+    return {
+        "token": token,
+        "headers": headers,
+        "url": url
+    }
+
+# BASE CLASSES
+class User:
+    """defining a class for user"""
+    def __init__(self):
+        creds = get_api_credentials()
+        self.token = creds['token']
+        self.headers = creds['headers']
+        self.url = creds['url']
+
+class Ship(User):
+    """starting a class"""
+    def __init__(self, symbol): 
+        super().__init__() 
+        self.symbol = symbol
+        self.cargo_capacity = None
+        self.cargo_used = None
+        self.cargo_free = None
+        self.fuel_capacity = None 
+        self.fuel_available = None
+        self.fuel_user = None
+        self.fuel_percentage = None
+        self.status = None
+        self.flight_mode = None
+        self.system = None
+        self.ship_role = None
+        self.ship_x = None
+        self.ship_y = None
+        self.ship_coordinates = None
+        self.fetch_ship_data()  
+
+    def fetch_ship_data(self):
+        """Fetch ship data from the API and update the instance variables."""
+        try:
+            response = requests.get(f"{self.url}my/ships/{self.symbol}", headers=self.headers)
+            response.raise_for_status()  # Raise an error for bad responses
+            data = response.json().get('data', {})  
+            print(json.dumps(data, indent=4))  # Debugging line to see the raw data
+            self.cargo_capacity = data.get('cargo', {}).get('capacity', 0)
+            self.cargo_used = data.get('cargo', {}).get('units', 0)
+            self.cargo_free = self.cargo_capacity - self.cargo_used
+            self.fuel_capacity = data.get('fuel', {}).get('capacity', 0)
+            self.fuel_available = data.get('fuel', {}).get('current', 0)
+            self.fuel_used = self.fuel_capacity - self.fuel_available
+            self.fuel_percentage = round(self.fuel_available / self.fuel_capacity, 2) * 100 if self.fuel_capacity > 0 else 0
+            self.status = data.get('nav', {}).get('status', 'UNKNOWN')
+            self.flight_mode = data.get('nav', {}).get('flightMode', 'UNKNOWN')
+            self.system = data.get('nav', {}).get('systemSymbol', 'UNKNOWN')
+            self.ship_role = data.get('role', 'UNKNOWN')
+            self.ship_x = data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN')
+            self.ship_y = data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN')
+            self.ship_coordinates = (data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN'), data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN'))
+            return data
+        except requests.exceptions.RequestException as e:
+            print(f"API request failed with status code {response.status_code}: {e}") 
+            return None
+        
+    def __str__(self):
+        """Return a string representation of the ship."""
+        return (f"Ship Name: {self.symbol}, "
+                f"Cargo Capacity: {self.cargo_capacity}, "
+                f"Cargo Used: {self.cargo_used}, "
+                f"Cargo Free: {self.cargo_free}, "
+                f"Fuel Capacity: {self.fuel_capacity}, "
+                f"Fuel Available: {self.fuel_available}, "
+                f"Status: {self.status}")
+
 #ship information
 def get_ship_info(ship):
     """
@@ -54,7 +130,6 @@ def get_ship_info(ship):
         print(f"Error: {response.status_code}")
         print(response.text)
 
-systemSymbol = get_ship_info("LONESTARTIGER-1")['ship_system']
 #agent & account information
 def get_agent_info():
     """
@@ -80,8 +155,6 @@ def get_agent_info():
     else:
         print(f"Error: {response.status_code}")
         print(response.text)
-
-get_agent_info()
 
 
 def print_ship_info(ship):
@@ -136,8 +209,6 @@ def print_ship_info(ship):
         print(f"Error: {response.status_code}")
         print(response.text)
 
-get_ship_info("LONESTARTIGER-1")
-print_ship_info("LONESTARTIGER-1")
 
 def dock_ship(ship, destination=None):
     """
@@ -157,9 +228,8 @@ def dock_ship(ship, destination=None):
     ship = ship.upper()   
     dock = requests.post(url + 'my/ships/' + ship + '/dock', headers=headers,
                          data={'waypointSymbol': destination})
-    return f"Ship status: {get_ship_info(ship)['ship_status']}.\n"
+    return f"Ship status: {get_ship_info(ship)['ship_status']}."
 
-print(dock_ship('LONESTARTIGER-1'))
 
 
 def refuel_ship(ship):    # refueling ship
@@ -177,14 +247,13 @@ def refuel_ship(ship):    # refueling ship
         else:
             result = error['error']['message']
     else:
-        result = (f"   Refueling successful at {get_ship_info(ship)['ship_waypoint']}.\n"
-                 f"    Units of fuel purchased: {fuel_pretty['data']['transaction']['units']}\n"
-                 f"    Price per unit: {fuel_pretty['data']['transaction']['pricePerUnit']}\n"
-                 f"    Total cost: {fuel_pretty['data']['transaction']['totalPrice']}\n"
-                 f"Refuel complete.\n")
+        result = f"""Refueling successful at {get_ship_info(ship)['ship_waypoint']}.
+                        Units of fuel purchased: {fuel_pretty['data']['transaction']['units']}
+                        Price per unit: {fuel_pretty['data']['transaction']['pricePerUnit']}
+                        Total cost: {fuel_pretty['data']['transaction']['totalPrice']}
+                      Refuel complete."""
     return result
 
-print(refuel_ship('LONESTARTIGER-1'))
 
 def launch_to_orbit(ship):  # back to orbit for travel
     print(f"Undocking ship from {get_ship_info(ship)['ship_waypoint']}.\n")
@@ -199,8 +268,21 @@ def launch_to_orbit(ship):  # back to orbit for travel
                   f"Successfully launched to orbit.\n")
     return result
 
-print(launch_to_orbit('LONESTARTIGER-1'))
 
+def euclidean_distance(ship, destination_coord):
+    """
+    Calculate the Euclidean distance between the ships coordinates and the given destination coordinates.
+    :ship: name of the ship of interest, used to pass to get_ship_info to get the ship's coordinates
+    :param ship_coord: Tuple of the ship's coordinates (x, y).
+    :param destination_coord: Tuple of the destination coordinates (x, y).
+    """
+    ship_coord = get_ship_info(ship)['ship_coord']
+    #print(f"Ship Coordinates: {ship_coord}")
+    #print(f"Destination Coordinates: {destination_coord}")
+    # Calculate the Euclidean distance
+    #print(f"Euclidean Distance: {((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5}")
+    # Return the distance
+    return ((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5
 
 def get_fuel_stations(systemSymbol):
     """
@@ -282,44 +364,13 @@ def find_nearest_fuel_station(ship): #, systemsymbol):
     #print(f"Closest Station: {closest_station['symbol']}; {closest_station['coordinates']}; Distance: {closest_station['distance']}")   
     return closest_station
 
-find_nearest_fuel_station('LONESTARTIGER-1')
 
-print(find_nearest_fuel_station('LONESTARTIGER-1')['symbol'])
+import json
+import requests
+response = requests.get(f"{url}my/ships/LONESTARTIGER-1", headers=headers)
+response.raise_for_status()  # Raise an error for bad responses
+data = response.json().get('data', {})  
+print(json.dumps(data, indent=4))  # Debugging line to see the raw data
 
-
-
-#response = requests.get(url + 'my/ships/LONESTARTIGER-1', headers=headers)
-#ships_data = response.json()
-#ship_x = ships_data['data']['nav']['route']['destination']['x']
-#ship_y = ships_data['data']['nav']['route']['destination']['y']
-#ship_coord = (ship_x, ship_y)
-#print(f"Ship Coordinates: {ship_coord}")
-#print(ship_x)
-#print(ship_y)
-#print(json.dumps(ships_data, indent=4))
-
-
-def euclidean_distance(ship, destination_coord):
-    """
-    Calculate the Euclidean distance between the ships coordinates and the given destination coordinates.
-    :ship: name of the ship of interest, used to pass to get_ship_info to get the ship's coordinates
-    :param ship_coord: Tuple of the ship's coordinates (x, y).
-    :param destination_coord: Tuple of the destination coordinates (x, y).
-    """
-    ship_coord = get_ship_info(ship)['ship_coord']
-    #print(f"Ship Coordinates: {ship_coord}")
-    #print(f"Destination Coordinates: {destination_coord}")
-    # Calculate the Euclidean distance
-    #print(f"Euclidean Distance: {((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5}")
-    # Return the distance
-    return ((ship_coord[0] - destination_coord[0]) ** 2 + (ship_coord[1] - destination_coord[1]) ** 2) ** 0.5
-
-euclidean_distance('LONESTARTIGER-1', (12, -24))
-
-print(get_ship_info("LONESTARTIGER-1")['ship_status'])
-
-
-
-print(get_ship_info("LONESTARTIGER-1")['ship_coord'])
 
 
