@@ -1,6 +1,7 @@
 import json
 import requests
 import time
+import config
 
 
 # VARIABLES
@@ -83,3 +84,7 @@ print(ship1.fuel_percentage)
 print(ship1.ship_coordinates)
 
 print(ship1.status)
+
+print(ship1.symbol)
+
+config
