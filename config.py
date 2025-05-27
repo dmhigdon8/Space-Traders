@@ -3,13 +3,19 @@
 # MODULES
 import json
 import requests
+from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple, Any, Union
 
 # VARIABLES
-token: str = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNS0xOCIsImlhdCI6MTc0NzcxMzk1OCwic3ViIjoiYWdlbnQtdG9rZW4ifQ.XGItP-gPIvscAw9SwcAFVlFSnLTkWbftYU3b619LjuI8SaX4oyVsA-PyXj35GLYXzZvOWfT96PpSpntw5YTHlnT795vBTXgzBvfh2989AiLXE5dxNpZ32JTgZKm3b2dLim7A2W4n4cn28Dzc7AOUsvr8fNlm1V5GSVvLtotTkyrDc_Q-3xF0HJjVXMg9Nj8f_fV17U6jV-RdeemSMiXPJ7dMlkW9xi3sWOVry2-hzbmkO8FmjNGbxkKMAu-CG1L_FQX7ZeOS2z4vcn475t1Ru7_mB7Z4_pvXfH631CcHuE-gGKLBkY5lI9fU4ccKswpo5P3z25woJGDjtPjxGC1-8-L_iYp4BuWUVi2drOX4Bh3DESO6darTQdi5wuMbLOogYLTAVNEGubXnbuDlJuGFhIL4RyqXTu1zO7TQTi_ox_1rseEhZGczzdZcVw9OA0MP2Gox5vLFzVTeF8u47y0UtHdVbxWW10MnrFlBDlzk4FlA8WnmHhQd0SzUPexsb3XpFLpLi16YjMf79guUX-tJ7VXhtccv3q-mKI_8NwNwotHZac_RJVen65-PnJkQbZAyF6jSqLF_jgShizD84dgylWMS3UeKoRui3XVQLEngbvUiCQXyPAOR0Ix5IuqMe6KpLe9hE0niurzynUx5s3bOqnhGamCLAZu9t67uHvvxXfU'
+token: str = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNS0yNSIsImlhdCI6MTc0ODMxNzc1NCwic3ViIjoiYWdlbnQtdG9rZW4ifQ.ALNy8FaGh6thSV2JiHlJvYl7gf2uIOfu7I4Bh8F076zD-wsYFxPryMEVbtrvYx3C_9XWlHoSZWMoVehm9EePg21WWUS70tUuDigAqcyjtj3mOxt2bFHHPPgdcbDWdSaWMDj5dZHBPRaeugZLy6mNCdQHo33UdeAtgBUdFyEv7poUGLwxIkXG4m-sUaI0i3tp7U96AVXvyXE3pISFESQjF_9vw9GTUueWgFpAAzOTTfTISQsHCB9vf0_izLX15E0ry-80UdP0EJesjlwYwc8vnyKj62WSvLzYHbZWl-OqbAtK-k668SYcCR9fJ3G-oSfhyd_PwlfXNPYldFcc7nFxEnQL7S1LnQEIxefTZ8l6M_HrNQWggmmHbxk0pf7dVqVybtNUCRD0-DrFN3x3ewp0tubkCmbmNZd1w3NloGj-56ogIpNSBuABc7nm6XKzQdSdMYltnEbL12hZvyFf1iHaB9A89owXIaFRLU0YqRqPyEbJhnQ_wj6becpyOWpzg4EkMZi4LnsytA61ZSCEjAiDNoxBJaKCv5La8NUbnABeFUyzSlRWA3KdOkL57uPFtf8_eLlEC2nBxOSxxbP5NH7SJgmBR2hjIpSxhr6jDvHW9ViCt_xpwBN7wHvnFk9ZsiH0YyMbNoeX0zzXLqnAXb-B_i_40mv36G-PFsEqsxId26o'
 headers: Dict[str, str] = {'Authorization': 'Bearer ' + token}
 url: str = 'https://api.spacetraders.io/v2/'
 response: requests.Response = requests.get(url + 'my/ships', headers=headers)
+player_name: str = 'LONESTARTIGER'
+start_of_current_week = datetime.now() - timedelta(days=datetime.now().weekday())  # Monday of the current week
+str_start_of_current_week: str = start_of_current_week.strftime('%Y-%m-%d')
+print(f"Start of current week: {start_of_current_week.strftime('%Y-%m-%d')}")
+
 
 
 
@@ -32,6 +38,33 @@ class User:
         self.token: str = creds['token']
         self.headers: Dict[str, str] = creds['headers']
         self.url: str = creds['url']
+
+    def see_contracts(self) -> Optional[Dict[str, Any]]:
+        """
+        Fetches the user's contracts from the API.
+        """
+        try:
+            response = requests.get(f"{self.url}my/contracts", headers=self.headers)
+            response.raise_for_status()  # Raise an error for bad responses
+            return response.json().get('data', {})
+        except requests.exceptions.RequestException as e:
+            print(f"API request failed: {e}")
+            return None
+        
+    def accept_first_contract(self) -> Optional[Dict[str, Any]]:
+        """
+        Accepts the first contract by its ID.
+        :param contract_id: The ID of the contract to accept.
+        """
+        data = self.see_contracts()
+        contract_id = data[0].get('id')
+        try:
+            response = requests.post(f"{self.url}my/contracts/{contract_id}/accept", headers=self.headers)
+            response.raise_for_status()  # Raise an error for bad responses
+            return response.json().get('data', {})
+        except requests.exceptions.RequestException as e:
+            print(f"API request failed: {e}")
+            return None
 
 class Ship(User):
     """starting a class"""
