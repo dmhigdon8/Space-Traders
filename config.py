@@ -113,6 +113,34 @@ class Ship(User):
             print(f"API request failed with status code {response.status_code}: {e}") 
             return None
         
+    def get_ship_status(self) -> Dict[str, Any]:
+        """
+        Get the current status of the ship.
+        :return: A dictionary containing the ship's status and other details.
+        """
+        try:
+            response = requests.get(f"{self.url}my/ships/{self.symbol}", headers=self.headers)
+            response.raise_for_status()  # Raise an error for bad responses
+            data = response.json().get('data', {})
+            return f"Ship Status: {data.get('nav', {}).get('status', 'UNKNOWN')}, " \
+                   f"Flight Mode: {data.get('nav', {}).get('flightMode', 'UNKNOWN')}, " 
+        except requests.exceptions.RequestException as e:
+            print(f"API request failed: {e}")
+            return {}
+        
+    def navigate_to_waypoint(self, waypoint_symbol: str) -> Optional[Dict[str, Any]]:
+        """
+        Navigate the ship to a specified waypoint.
+        :param waypoint_symbol: The symbol of the waypoint to navigate to.
+        """
+        try:
+            response = requests.post(f"{self.url}my/ships/{self.symbol}/navigate", headers=self.headers, json={"waypointSymbol": waypoint_symbol})
+            response.raise_for_status()  # Raise an error for bad responses
+            return response.json().get('data', {})
+        except requests.exceptions.RequestException as e:
+            print(f"API request failed: {e}")
+            return None
+        
     def __str__(self):
         """Return a string representation of the ship."""
         return (f"Ship Name: {self.symbol}, "
