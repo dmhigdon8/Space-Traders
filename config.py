@@ -105,6 +105,7 @@ class Ship(User):
             self.flight_mode = data.get('nav', {}).get('flightMode', 'UNKNOWN')
             self.system = data.get('nav', {}).get('systemSymbol', 'UNKNOWN')
             self.ship_role = data.get('role', 'UNKNOWN')
+            self.ship_waypoint = data.get('nav', {}).get('waypointSymbol', 'UNKNOWN')
             self.ship_x = data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN')
             self.ship_y = data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN')
             self.ship_coordinates = (data.get('nav', {}).get('route', {}).get('destination', {}).get('x', 'UNKNOWN'), data.get('nav', {}).get('route', {}).get('destination', {}).get('y', 'UNKNOWN'))
@@ -127,6 +128,13 @@ class Ship(User):
         except requests.exceptions.RequestException as e:
             print(f"API request failed: {e}")
             return {}
+        
+    def get_ship_location(self) -> Tuple[Optional[int], Optional[int]]:
+        """
+        Get the current coordinates of the ship.
+        :return: A tuple containing the x and y coordinates of the ship.
+        """
+        return self.ship_waypoint
         
     def navigate_to_waypoint(self, waypoint_symbol: str) -> Optional[Dict[str, Any]]:
         """
@@ -431,4 +439,7 @@ data = response.json().get('data', {})
 print(json.dumps(data, indent=4))  # Debugging line to see the raw data
 
 
-
+response = requests.get(f"{url}my/ships/LONESTARTIGER-1", headers=headers)
+response.raise_for_status()  # Raise an error for bad responses
+data = response.json().get('data', {})  
+print(json.dumps(data, indent=4))  
