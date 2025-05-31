@@ -35,6 +35,7 @@ print(ship1.get_ship_location())
 
 # 8. Mine the asteroid for the item
 # need to fix this, it's not working, also should add in logic to navigate to sell/deliver items once cargo is full
+#test
 ship1.mine(contract_item)
 
 import requests
