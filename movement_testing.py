@@ -13,6 +13,7 @@ print(ship1.fuel_percentage)
 
 # 3. Check contracts and accept
 gt.see_contracts()
+gt.accept_first_contract()
 
 # 4. Store item the contract is for
 contract_item = gt.see_contracts()[0]['terms']['deliver'][0]['tradeSymbol']
