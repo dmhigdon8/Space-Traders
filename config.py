@@ -472,7 +472,3 @@ def find_nearest_fuel_station(ship): #, systemsymbol):
     #print(f"Closest Station: {closest_station['symbol']}; {closest_station['coordinates']}; Distance: {closest_station['distance']}")   
     return closest_station
 
-response = requests.post(f"{url}my/ships/LONESTARTIGER-1/extract", headers=headers)
-response.raise_for_status()
-mine_data = response.json().get('data', {})
-print(json.dumps(mine_data, indent=4))
