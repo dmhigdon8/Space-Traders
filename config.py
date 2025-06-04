@@ -183,7 +183,7 @@ class Ship(User):
                 f"Inventory: {cargo_pretty.get('data').get('inventory')}\n")
             for item in cargo_pretty['data']['inventory']:
                 #NEED TO GENERALIZE THIS, SHOULD PASS A PARAMETER FOR THE ITEM FOR CONTRACT RATHER THAN HARD CODING
-                if item['symbol'] != 'COPPER_ORE':
+                if item['symbol'] != item_symbol:
                     jettison_symbol = item['symbol']
                     jettison_units = item['units']
                     print(f"Jettisoning {jettison_units} units of {jettison_symbol}")
