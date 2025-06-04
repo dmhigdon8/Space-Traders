@@ -19,6 +19,7 @@ gt.accept_first_contract()
 contract_item = gt.see_contracts()[0]['terms']['deliver'][0]['tradeSymbol']
 contract_quantity = gt.see_contracts()[0]['terms']['deliver'][0]['unitsRequired']
 contract_delivery_location = gt.see_contracts()[0]['terms']['deliver'][0]['destinationSymbol'] 
+print(f"Contract item: {contract_item}, Quantity: {contract_quantity}, Delivery Location: {contract_delivery_location}")
 
 
 # 5. Find item/asteroid to mine for the item
@@ -91,22 +92,3 @@ mining_attempts = 1
 
 
 
-import json
-import requests
-from datetime import datetime, timedelta
-from typing import Dict, Optional, Tuple, Any, Union
-import time
-
-token: str = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZGVudGlmaWVyIjoiTE9ORVNUQVJUSUdFUiIsInZlcnNpb24iOiJ2Mi4zLjAiLCJyZXNldF9kYXRlIjoiMjAyNS0wNi0wMSIsImlhdCI6MTc0ODgzOTc1MCwic3ViIjoiYWdlbnQtdG9rZW4ifQ.ga1o-XcqagQEj1DQ0WpH_s_4e8eQm5HdNlKWZrLwg7D8zP5-aYGHdr4jXqcQF5kRW4DW3TMjC_h7yj5JzMieBTJbG_a549jQ7HlaUbMbMjrQvyku-UlupmrCAIi7WfpVaBgB9zJiRXqPSxHEISsVH2GEXDpv7VCY_eoBmKpmjURhNadNygWIVmqhHV1xzX-8JRNtNaAQzv35wS5yBQ2pMroYm8b64kJROmM1YzRUr5tVxcvD0EezNJV9ew8E67W_GSbq0YgGtTT6oBJHmEL0ISCOnOuOE2aWTRnAi9jq76Z5Ooko8yH45dnxAyjtE8JR8US7e3yGE5iP3Ts02v0ne3JcX9yw_gkq3IHZCa7Xy8uHWSoZGkF7yIcqFIcbxTJxnDk4wEn6v2uOt8JB6M6qwxqJYlqDSl2mImC9z5jfgK2zJ-oM_pkPKfqdtR9ldud2oCcflXRPM4xmZ5k_vW4SYbrANCwVZZ5ceUwAi6ZSyMZJhkHED0FRN5CL0khriX-TgwLaUyJP5IWdTBmJYwIGY_jZr-4iG-KHC9vLOaHQ61C1njdRt7UHSM1QvkY4vC7IAAtK0dn7gXVkgvDckXSkf5SQZmaOPf4o9id8lAhOGC156rfJagE_rgTj0ShmWFJliwrqUQeLG6M0aHLCCrqDRFrRT6VCDP32kTrQ5czMR3Y'
-headers: Dict[str, str] = {'Authorization': 'Bearer ' + token}
-
-mine = requests.post(f"https://api.spacetraders.io/v2/my/ships/LONESTARTIGER-1/extract", headers=headers)
-mine_pretty = json.loads(mine.text)
-print(json.dumps(mine_pretty, indent=4))
-cooldown_data = mine.json().get('data', {})["cooldown"]
-cooldown_data = {
-    'total_seconds': cooldown_data.get('totalSeconds', 0),
-    'remaining_seconds': cooldown_data.get('remainingSeconds', 0),
-    'expiration': cooldown_data.get('expiration', 'UNKNOWN')
-}
-print(cooldown_data['remaining_seconds'])
