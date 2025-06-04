@@ -162,8 +162,13 @@ class Ship(User):
             #perform mining
             mine = requests.post(f"{self.url}my/ships/{self.symbol}/extract", headers=headers)
             mine_pretty = json.loads(mine.text)
-            cooldown_data = response.json().get('data', {})
-            ship_cooldown = cooldown_data.get('cooldown', {}).get('totalSeconds', 0)
+            cooldown_data = mine.json().get('data', {})["cooldown"]
+            cooldown_data = {
+                'total_seconds': cooldown_data.get('totalSeconds', 0),
+                'remaining_seconds': cooldown_data.get('remainingSeconds', 0),
+                'expiration': cooldown_data.get('expiration', 'UNKNOWN')
+                }
+            ship_cooldown = cooldown_data['remaining_seconds']
             print(json.dumps(mine_pretty, indent=4))
 
             #check cargo hold post mining
@@ -182,7 +187,7 @@ class Ship(User):
                     jettison_symbol = item['symbol']
                     jettison_units = item['units']
                     print(f"Jettisoning {jettison_units} units of {jettison_symbol}")
-                    jettison = requests.post('https://api.spacetraders.io/v2/my/ships/' + ship_symbol + '/jettison', headers=config.headers, json={'symbol': jettison_symbol, 'units': jettison_units})
+                    requests.post(f"{self.url}my/ships/{self.symbol}/jettison", headers=headers, json={'symbol': jettison_symbol, 'units': jettison_units})
         
             if cargo_units_used >= cargo_units:
                 print("Cargo hold is full, stopping mining.")
