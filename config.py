@@ -18,8 +18,6 @@ str_start_of_current_week: str = start_of_current_week.strftime('%Y-%m-%d')
 print(f"Start of current week: {start_of_current_week.strftime('%Y-%m-%d')}")
 
 
-#test
-
 # SETUP
 def get_api_credentials() -> Dict[str, Union[str, Dict[str, str]]]:
     """
