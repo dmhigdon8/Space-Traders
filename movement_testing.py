@@ -22,7 +22,6 @@ contract_quantity = gt.see_contracts()[0]['terms']['deliver'][0]['unitsRequired'
 contract_delivery_location = gt.see_contracts()[0]['terms']['deliver'][0]['destinationSymbol'] 
 print(f"Contract item: {contract_item}, Quantity: {contract_quantity}, Delivery Location: {contract_delivery_location}")
 
-
 # 5. Find item/asteroid to mine for the item
 location_type = 'ENGINEERED_ASTEROID'
 systemSymbol = ship1.system
