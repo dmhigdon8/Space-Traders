@@ -69,21 +69,6 @@ class Ship(User):
                 f"Status: {self.status}")
     
 
-ship1 = Ship('LONESTARTIGER-1', token, headers, url) 
-print(ship1)
-ship1.fetch_ship_data()
-ship1.ship_x
 
 
-print(ship1.status) 
-print(ship1.cargo_capacity)
-print(ship1.fuel_available)
-print(ship1.fuel_used)
-print(ship1.fuel_percentage)
-print(ship1.ship_coordinates)
 
-print(ship1.status)
-
-print(ship1.symbol)
-
-config
