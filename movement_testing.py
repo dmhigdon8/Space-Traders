@@ -2,7 +2,6 @@ import config
 import requests
 import json
 
-
 #STEPS# 1. Create a ship instance with the symbol 'LONESTARTIGER-1'.
 gt = config.User()
 
