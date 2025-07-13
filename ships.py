@@ -18,7 +18,6 @@ for index, ship in enumerate(ships_data['data'], start=1):
     ships[f'ship_{index}_fuel_available'] = ship['fuel']['current']
     ships[f'ship_{index}_fuel_burned'] = ship['fuel']['capacity'] - ship['fuel']['current']
 
-
 for key, value in ships.items():
     print(f"{key}: {value}") 
 
